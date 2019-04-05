@@ -52,7 +52,7 @@ class BaseWorker(AbstractWorker):
             variables are instantiated or deleted as opposed to handling
             tensor/variable/model lifecycle internally. Set to True if this
             object is not where the objects will be stored, but is instead
-            a pointer to a worker that eists elsewhere.
+            a pointer to a worker that exists elsewhere.
         log_msgs: An optional boolean parameter to indicate whether all
             messages should be saved into a log for later review. This is
             primarily a development/testing feature.
@@ -230,7 +230,6 @@ class BaseWorker(AbstractWorker):
 
         # Step 2: Serialize the message to simple python objects
         bin_response = sy.serde.serialize(response)
-
         return bin_response
 
         # SECTION:recv_msg() uses self._message_router to route to these methods
@@ -303,7 +302,6 @@ class BaseWorker(AbstractWorker):
         :param message: the message specifying the command and the args
         :return: a pointer to the result
         """
-
         (command_name, _self, args, kwargs), return_ids = message
 
         # TODO add kwargs
@@ -395,7 +393,6 @@ class BaseWorker(AbstractWorker):
         Args:
             obj_id: A string or integer id of an object to look up.
         """
-
         try:
             obj = self._objects[obj_id]
 
@@ -725,9 +722,9 @@ class BaseWorker(AbstractWorker):
         Args:
             query: a list of strings to match against.
             me: a reference to the worker calling the search.
-            """
+        """
         results = list()
-        for key, tensor in self._objects.items():
+        for key, obj in self._objects.items():
             found_something = True
             for query_item in query:
                 # If deserialization produced a bytes object instead of a string,
@@ -739,12 +736,12 @@ class BaseWorker(AbstractWorker):
                 if query_item == str(key):
                     match = True
 
-                if tensor.tags is not None:
-                    if query_item in tensor.tags:
+                if obj.tags is not None:
+                    if query_item in obj.tags:
                         match = True
 
-                if tensor.description is not None:
-                    if query_item in tensor.description:
+                if obj.description is not None:
+                    if query_item in obj.description:
                         match = True
 
                 if not match:
@@ -754,9 +751,7 @@ class BaseWorker(AbstractWorker):
                 # set garbage_collect_data to False because if we're searching
                 # for a tensor we don't own, then it's probably someone else's
                 # decision to decide when to delete the tensor.
-                ptr = tensor.create_pointer(
-                    garbage_collect_data=False, owner=sy.local_worker
-                ).wrap()
+                ptr = obj.create_pointer(garbage_collect_data=False, owner=sy.local_worker).wrap()
                 results.append(ptr)
 
         return results
