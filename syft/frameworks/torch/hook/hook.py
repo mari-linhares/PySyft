@@ -635,7 +635,6 @@ class TorchHook:
             """
             Operate the hooking
             """
-
             if not hasattr(self, "child"):  # means that it's not a wrapper
                 method = getattr(self, f"native_{method_name}")
                 # Run the native function with the new args

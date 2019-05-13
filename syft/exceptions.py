@@ -138,16 +138,20 @@ class GetNotPermittedError(Exception):
 def route_method_exception(exception, self, args, kwargs):
     try:
         if self.is_wrapper:
+            print('AAAAAAA', args[0])
             if isinstance(self.child, sy.PointerTensor):
                 if len(args) > 0:
                     if not args[0].is_wrapper:
+                        print('AAAAAAAAAAA', self.location, args[0].location)
                         return TensorsNotCollocatedException(self, args[0])
                     elif isinstance(args[0].child, sy.PointerTensor):
+                        print('AAAAAAAAAAA', self.location, args[0].child.location)
                         if self.location != args[0].child.location:
                             return TensorsNotCollocatedException(self, args[0])
 
         # if self is a normal tensor
         elif isinstance(self, torch.Tensor):
+            print('BBBBBB', args[0])
             if len(args) > 0:
                 if args[0].is_wrapper:
                     if isinstance(args[0].child, sy.PointerTensor):

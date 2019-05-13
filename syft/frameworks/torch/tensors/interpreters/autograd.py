@@ -68,7 +68,6 @@ class AutogradTensor(AbstractTensor):
 
     def attr(self, attr_name):
         attr_val = self.child.attr(attr_name)
-
         return attr_val
 
     def __getattribute__(self, name):
@@ -106,6 +105,13 @@ class AutogradTensor(AbstractTensor):
     def __mul__(self, other):
         return self.mul(other)
 
+    def get(self, deregister_ptr: bool = True):
+        if self.grad is not None and hasattr(self.grad, 'child'):
+            self.grad.get(deregister_ptr)
+
+        self.child.get(deregister_ptr)
+        return self
+
     @classmethod
     def handle_func_command(cls, command):
         """
@@ -137,3 +143,5 @@ class AutogradTensor(AbstractTensor):
         response = syft.frameworks.torch.hook_args.hook_response(cmd, response, wrap_type=cls)
 
         return response
+
+
